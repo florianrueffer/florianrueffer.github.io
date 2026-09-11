@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Florian's Tools & Tips</title>
+    <title>Florian Rüffer</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
@@ -19,26 +19,63 @@
             }
         })();
     </script>
+    <style>
+        .construction {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            border-radius: 50px;
+            padding: 7px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 1.8rem;
+        }
+        .construction .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background-color: #f59e0b;
+            animation: blink 2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 3rem;
+            width: 100%;
+            max-width: 720px;
+        }
+        .quick-link {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            text-align: left;
+            transition: var(--transition);
+        }
+        .quick-link:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+        .quick-link .icon { font-size: 1.5rem; display: block; margin-bottom: 10px; }
+        .quick-link h3 { font-size: 1.05rem; color: var(--text-primary); margin-bottom: 5px; }
+        .quick-link p { font-size: 0.87rem; color: var(--text-secondary); margin: 0; }
+    </style>
 </head>
 <body>
     <header>
-        <div class="brand">IncredibleRacoon</div>
-        
+        <div class="brand">Florian Rüffer</div>
         <div class="nav-container">
             <nav class="nav-links">
                 <a href="index.html" class="active">Home</a>
-                <a href="checklists.html">Checklists</a>
+                <a href="learning.html">Learning</a>
                 <a href="tools.html">Tools</a>
-                <a href="resources.html">Resources</a>
             </nav>
-            
-            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode">
-                <!-- Sun Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="icon-sun" style="display: var(--icon-sun-display, block);">
-                    <path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zM12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                </svg>
-            </button>
-            
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode"></button>
             <button class="menu-toggle" aria-label="Menu">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
@@ -46,17 +83,29 @@
     </header>
 
     <main class="hero">
-        <h1 style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hardware Design Hub</h1>
-        <p>Expert tools, checklists, and resources for professional electronics development.</p>
-        
-        <div style="display: flex; gap: 15px; margin-top: 2rem; flex-wrap: wrap; justify-content: center;">
-            <a href="checklists.html" class="hero-btn" style="text-decoration: none;">Browse Checklists</a>
-            <a href="tools.html" class="hero-btn" style="text-decoration: none; background-color: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border);">Open Tools</a>
+        <div class="construction"><span class="dot"></span> This site is still under construction</div>
+
+        <h1>Florian Rüffer</h1>
+        <p>Computer scientist passionate about robotics, AI, and embedded hardware &ndash; from
+           circuit design to creative automation projects. Always curious to explore new
+           technologies and turn ideas into working systems.</p>
+
+        <div class="quick-links">
+            <a href="learning.html" class="quick-link">
+                <span class="icon">中文</span>
+                <h3>Learning</h3>
+                <p>Chinese vocabulary trainer with native audio, flashcards and quizzes.</p>
+            </a>
+            <a href="tools.html" class="quick-link">
+                <span class="icon">🛠️</span>
+                <h3>Tools</h3>
+                <p>Calculators for PCB layout and circuit design.</p>
+            </a>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2026 IncredibleRacoon. All rights reserved.</p>
+        <p>&copy; 2026 Florian Rüffer. All rights reserved.</p>
     </footer>
 
     <script src="assets/js/script.js"></script>
