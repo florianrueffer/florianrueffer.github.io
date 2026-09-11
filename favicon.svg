@@ -6,10 +6,13 @@
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="115" fill="url(#g)"/>
-  <!-- Geschweifte Klammern aus 45-Grad-Leiterbahnen, Via-Pad als Mittelpunkt -->
-  <g fill="none" stroke="#fff" stroke-width="38" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M186 126 H142 V212 L100 256 L142 300 V386 H186"/>
-    <path d="M326 126 H370 V212 L412 256 L370 300 V386 H326"/>
+  <!-- Geschweifte Klammern, Arm -> Einzug -> Spitze zur Mitte -> zurueck -->
+  <g fill="none" stroke="#fff" stroke-width="38" stroke-linecap="round">
+    <path d="M208 116 C168 116 162 138 162 176 C162 218 152 240 118 256
+             C152 272 162 294 162 336 C162 374 168 396 208 396"/>
+    <path d="M304 116 C344 116 350 138 350 176 C350 218 360 240 394 256
+             C360 272 350 294 350 336 C350 374 344 396 304 396"/>
   </g>
-  <circle cx="256" cy="256" r="44" fill="#fff"/>
+  <!-- Via: Ring mit offenem Bohrloch, kein gefuellter Punkt -->
+  <circle cx="256" cy="256" r="46" fill="none" stroke="#fff" stroke-width="22"/>
 </svg>
