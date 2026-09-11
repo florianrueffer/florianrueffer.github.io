@@ -1,0 +1,7 @@
+# macOS
+.DS_Store
+
+# Vollstaendige Abschrift der Lektionstexte. Die Vokabelliste selbst wird
+# unter CC BY-NC-ND 3.0 mit Quellenangabe veroeffentlicht (assets/data/zh-entries.js),
+# die kompletten Lektionstexte gehen darueber hinaus und bleiben lokal.
+learning/translations.txt

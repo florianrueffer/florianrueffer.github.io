@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinesisch - Learning</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'system';
+            if (saved === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); }
+            else if (saved === 'light') { document.documentElement.setAttribute('data-theme', 'light'); }
+            else {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            }
+        })();
+    </script>
+    <style>
+        .bar {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 22px; flex-wrap: wrap;
+        }
+        /* Vor/Zurück und Auswahl als ein zusammenhängendes Element */
+        .group {
+            display: inline-flex; align-items: stretch;
+            border: 1px solid var(--border); border-radius: var(--radius-md);
+            background-color: var(--bg-card); overflow: hidden;
+        }
+        .group:focus-within { border-color: var(--accent); }
+        .group > button {
+            background: transparent; border: none; color: var(--text-secondary);
+            padding: 0 13px; cursor: pointer; font-size: 1rem; font-family: inherit;
+            transition: var(--transition);
+        }
+        .group > button:hover:not(:disabled) { background-color: var(--bg-secondary); color: var(--accent); }
+        .group > button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .group > select {
+            background: transparent; border: none; color: var(--text-primary);
+            padding: 9px 12px; font-family: inherit; font-size: 0.93rem; cursor: pointer;
+            max-width: 260px; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+        }
+        .group > select:focus { outline: none; }
+        .group > select:only-child { border-left: none; border-right: none; }
+        .group.solo > select { border: none; }
+
+        .vocab { display: flex; flex-direction: column; }
+        .row {
+            display: flex; align-items: center; gap: 16px;
+            padding: 14px 4px; border-bottom: 1px solid var(--border);
+        }
+        .row:hover { background-color: var(--bg-secondary); }
+        .row.playing { box-shadow: inset 3px 0 0 var(--accent); background-color: rgba(59,130,246,0.07); }
+        .en { flex: 1; color: var(--text-secondary); font-size: 0.97rem; }
+        .zh { flex: 1; }
+        .zh .hanzi {
+            color: var(--text-primary); font-size: 1.35rem; line-height: 1.35;
+            font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        }
+        .zh .pinyin {
+            color: var(--text-secondary); font-size: 0.87rem;
+            margin-top: 3px; letter-spacing: 0.01em;
+        }
+        .play {
+            background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+            border-radius: 50%; width: 38px; height: 38px; padding: 0; flex-shrink: 0;
+            cursor: pointer; transition: var(--transition);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .play:hover { border-color: var(--accent); color: var(--accent); }
+        .play.playing { border-color: var(--accent); color: var(--accent); background-color: rgba(59,130,246,0.12); }
+        .play svg { width: 16px; height: 16px; fill: currentColor; }
+.check {
+            display: inline-flex; align-items: center; gap: 7px; cursor: pointer;
+            font-size: 0.88rem; color: var(--text-secondary); user-select: none;
+        }
+        .check input { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+        .check.on { color: #22c55e; }
+        .stat { font-size: 0.82rem; color: var(--text-secondary); margin-left: auto; }
+
+        .modes { display: flex; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; }
+        .chip {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 50px; padding: 8px 18px; color: var(--text-secondary);
+            font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            transition: var(--transition);
+        }
+        .chip:hover { border-color: var(--accent); color: var(--text-primary); }
+        .chip.active { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+
+        .opts {
+            display: flex; gap: 18px; flex-wrap: wrap; align-items: center;
+            font-size: 0.85rem; color: var(--text-secondary);
+            padding: 12px 0 18px; border-bottom: 1px solid var(--border); margin-bottom: 22px;
+        }
+        .opts label { display: inline-flex; align-items: center; gap: 6px; }
+        .opts select {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 6px 10px; color: var(--text-primary);
+            font-family: inherit; font-size: 0.85rem; cursor: pointer;
+        }
+
+        /* Karteikarte */
+        .card {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 50px 30px; text-align: center;
+            min-height: 280px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 14px;
+            cursor: pointer; position: relative;
+        }
+        .card:hover { border-color: var(--accent); }
+        /* Frage- und Antwortseite werden je nach Seite anders gesetzt:
+           Zeichen gross und in CJK-Schrift, Pinyin etwas kleiner, Englisch normal. */
+        .card .front { font-size: 1.9rem; font-weight: 600; color: var(--text-primary); }
+        .card .front-zh {
+            font-size: 3.2rem; color: var(--accent); font-weight: 500;
+            font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+        }
+        .card .front-py { font-size: 2.5rem; color: var(--accent); font-weight: 500; }
+        .card .back { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .card .back .ans { font-size: 1.5rem; color: var(--text-primary); }
+        .card .back .ans-zh {
+            font-size: 2.8rem; color: var(--accent); line-height: 1.3;
+            font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+        }
+        .card .back .ans-py { font-size: 2.1rem; color: var(--accent); }
+        .card .back .extra { font-size: 1.15rem; color: var(--text-secondary); }
+        .card .back .extra-zh { font-size: 1.5rem; font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif; }
+        .card .hint { position: absolute; bottom: 14px; left: 0; right: 0;
+                      font-size: 0.78rem; color: var(--text-secondary); opacity: 0.55; }
+        .card .lesson-tag { position: absolute; top: 14px; left: 18px;
+                            font-size: 0.74rem; color: var(--text-secondary); opacity: 0.7; }
+        .hide-until-flip { visibility: hidden; }
+
+        .actions { display: flex; gap: 12px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+        .btn {
+            padding: 11px 24px; border-radius: 50px; border: 1px solid var(--border);
+            background-color: var(--bg-card); color: var(--text-primary);
+            font-family: inherit; font-weight: 600; font-size: 0.93rem; cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .btn.good { border-color: #22c55e; color: #22c55e; }
+        .btn.bad { border-color: #ef4444; color: #ef4444; }
+        .btn.primary { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+
+        /* Quiz */
+        .qcard {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 36px 30px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 12px;
+        }
+        .qcard .q { font-size: 1.7rem; font-weight: 600; color: var(--text-primary); }
+        .qcard .q-zh {
+            font-size: 2.4rem; font-weight: 400;
+            font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+        }
+        .qcard .q-py { font-size: 2rem; font-weight: 500; }
+        .quiz-opts { display: grid; gap: 10px; margin-top: 20px; }
+        .qopt {
+            padding: 15px 20px; text-align: left; border-radius: var(--radius-md);
+            border: 1px solid var(--border); background-color: var(--bg-card);
+            color: var(--text-primary); font-family: inherit; font-size: 1.02rem;
+            cursor: pointer; transition: var(--transition);
+        }
+        .qopt:hover:not(:disabled) { border-color: var(--accent); }
+        .qopt.right { border-color: #22c55e; background-color: rgba(34,197,94,0.12); color: #22c55e; }
+        .qopt.wrong { border-color: #ef4444; background-color: rgba(239,68,68,0.12); color: #ef4444; }
+        .qopt:disabled { cursor: default; }
+        .qopt .opt-zh { font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif; font-size: 1.15rem; }
+
+/* Einstellungen hinter dem Zahnrad */
+        .gear {
+            background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
+            border-radius: 50%; width: 34px; height: 34px; padding: 0; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+        }
+        .gear:hover, .gear.open { border-color: var(--accent); color: var(--accent); }
+        .gear svg { width: 16px; height: 16px; fill: currentColor; }
+        .panel {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 18px 22px; margin-bottom: 22px;
+            display: grid; gap: 14px;
+        }
+        .panel .line { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .panel .lbl { font-size: 0.82rem; color: var(--text-secondary); min-width: 92px; }
+        .panel select {
+            background-color: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 6px 10px; color: var(--text-primary);
+            font-family: inherit; font-size: 0.85rem; cursor: pointer;
+        }
+        .tog {
+            background-color: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: 50px; padding: 6px 14px; color: var(--text-secondary);
+            font-family: inherit; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+            transition: var(--transition);
+        }
+        .tog:hover { border-color: var(--accent); }
+        .tog.on { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        .tog .zh { font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif; }
+        .panel .note { font-size: 0.78rem; color: var(--text-secondary); opacity: 0.75; }
+        .panel .line.off { opacity: 0.45; }
+
+        /* Schreibübung */
+        .write-box {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 40px 30px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 16px;
+        }
+        .write-box .prompt { font-size: 1.9rem; font-weight: 600; color: var(--text-primary); }
+        .write-box .prompt-zh {
+            font-size: 3rem; color: var(--accent); font-weight: 500;
+            font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif;
+        }
+        .write-box .prompt-py { font-size: 2.4rem; color: var(--accent); font-weight: 500; }
+        .write-box .ask { font-size: 0.85rem; color: var(--text-secondary); }
+        .write-input {
+            width: 100%; max-width: 460px; text-align: center;
+            background-color: var(--bg-secondary); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 13px 16px; color: var(--text-primary);
+            font-family: inherit; font-size: 1.25rem;
+        }
+        .write-input:focus { outline: none; border-color: var(--accent); }
+        .write-input.right { border-color: #22c55e; color: #22c55e; }
+        .write-input.wrong { border-color: #ef4444; color: #ef4444; }
+        .solution { font-size: 1.05rem; color: var(--text-secondary); min-height: 1.4em; }
+        .solution b {
+            color: var(--text-primary);
+            font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif;
+        }
+
+        /* Zuordnen: ein Raster, damit gegenüberliegende Kästen gleich hoch sind */
+        .match {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+            align-items: stretch;
+        }
+        .mitem {
+            background-color: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 14px 16px; cursor: pointer;
+            color: var(--text-primary); font-family: inherit; font-size: 1rem;
+            text-align: left; transition: var(--transition);
+            display: flex; align-items: center; min-height: 56px;
+            line-height: 1.4; word-break: break-word;
+        }
+        .mitem:hover:not(:disabled) { border-color: var(--accent); }
+        .mitem.sel { border-color: var(--accent); background-color: rgba(59,130,246,0.12); }
+        .mitem.done { opacity: 0.35; cursor: default; border-color: #22c55e; }
+        .mitem.miss { border-color: #ef4444; }
+        .mitem .m-zh {
+            font-family: "PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif;
+            font-size: 1.12rem; line-height: 1.35;
+        }
+        .mitem .m-py { font-size: 1.04rem; line-height: 1.35; }
+        @media (max-width: 560px) {
+            .match { grid-template-columns: 1fr; }
+            .mitem { min-height: 48px; }
+        }
+        .empty { color: var(--text-secondary); padding: 30px 0; line-height: 1.7; }
+        .credit {
+            margin: 38px 0 0; padding-top: 18px; border-top: 1px solid var(--border);
+            font-size: 0.78rem; line-height: 1.65; color: var(--text-secondary); opacity: 0.85;
+        }
+        .credit a { color: inherit; text-decoration: underline; }
+        .credit a:hover { color: var(--accent); }
+        .hide { display: none !important; }
+        @media (max-width: 620px) {
+            .row { flex-wrap: wrap; gap: 8px; }
+            .en, .zh { flex: 1 1 100%; }
+            .play { order: -1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">Florian Rüffer</div>
+        <div class="nav-container">
+            <nav class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../learning.html" class="active">Learning</a>
+                <a href="../tools.html">Tools</a>
+            </nav>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode"></button>
+            <button class="menu-toggle" aria-label="Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <h1>Chinesisch</h1>
+
+        <div class="bar">
+            <div class="group">
+                <button id="prev" aria-label="vorige Lektion">&larr;</button>
+                <select id="lesson-select" aria-label="Lektion"></select>
+                <button id="next" aria-label="nächste Lektion">&rarr;</button>
+            </div>
+
+            <div class="group solo">
+                <select id="view-select" aria-label="Übungsart">
+                    <option value="list">Liste</option>
+                    <option value="cards">Karteikarten</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="write">Schreiben</option>
+                    <option value="match">Zuordnen</option>
+                    <option value="mix">Mix</option>
+                </select>
+            </div>
+
+            <label class="check" id="done-label">
+                <input type="checkbox" id="lesson-done"> durchgearbeitet
+            </label>
+
+            <button class="gear" id="settings-toggle" aria-label="Einstellungen" title="Einstellungen">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94a7.4 7.4 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.62l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.56-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.86a.5.5 0 0 0 .12.62l2.03 1.58a7.4 7.4 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.62l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.38 1.04.7 1.62.94l.36 2.54c.04.24.25.42.5.42h3.84c.25 0 .46-.18.5-.42l.36-2.54c.58-.24 1.12-.56 1.62-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.62l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+            </button>
+
+            <span class="stat" id="pool-stat"></span>
+        </div>
+
+        <div class="panel hide" id="settings-panel">
+            <div class="line">
+                <span class="lbl">Umfang</span>
+                <select id="opt-scope">
+                    <option value="done">alle durchgearbeiteten Lektionen</option>
+                    <option value="lesson">nur diese Lektion</option>
+                </select>
+                <select id="opt-mode">
+                    <option value="weighted">gewichtet nach Fehlern</option>
+                    <option value="even">alle gleich häufig</option>
+                </select>
+            </div>
+            <div class="line">
+                <span class="lbl">Richtung</span>
+                <span id="opt-dirs"></span>
+            </div>
+            <div class="line" id="row-forms">
+                <span class="lbl">Zielform</span>
+                <span id="opt-forms"></span>
+                <span class="note">gilt nur für EN ↔ 中文</span>
+            </div>
+            <div class="line">
+                <span class="lbl">Im Mix</span>
+                <span id="opt-types"></span>
+            </div>
+        </div>
+
+        <div class="vocab" id="vocab"></div>
+
+        <section id="view-cards" class="hide">
+            <div class="card" id="card"></div>
+            <div class="actions">
+                <button class="btn bad" id="card-bad">Nicht gewusst</button>
+                <button class="btn" id="card-audio">Anhören</button>
+                <button class="btn good" id="card-good">Gewusst</button>
+            </div>
+        </section>
+
+        <section id="view-quiz" class="hide">
+            <div class="qcard" id="quiz-card"></div>
+            <div class="quiz-opts" id="quiz-opts"></div>
+        </section>
+
+        <section id="view-write" class="hide">
+            <div class="write-box">
+                <div class="prompt" id="write-prompt"></div>
+                <div class="ask" id="write-ask"></div>
+                <input type="text" class="write-input" id="write-input" autocomplete="off"
+                       autocorrect="off" autocapitalize="off" spellcheck="false"
+                       placeholder="Antwort eingeben und Enter">
+                <div class="solution" id="write-solution"></div>
+            </div>
+            <div class="actions">
+                <button class="btn primary" id="write-check">Prüfen</button>
+                <button class="btn" id="write-skip">Überspringen</button>
+            </div>
+        </section>
+
+        <section id="view-match" class="hide">
+            <div class="match" id="match-grid"></div>
+            <div class="actions"><button class="btn" id="match-new">Neue Runde</button></div>
+        </section>
+
+        <div class="stat" id="score" style="margin:20px 0 0;text-align:center;"></div>
+        <div class="stat" id="done-stat" style="margin:6px 0 0;text-align:center;"></div>
+
+        <audio id="audio" preload="metadata" style="display:none"></audio>
+
+        <p class="credit">
+            Die Vokabeln stammen aus dem Sprachkurs
+            <a href="https://www.goethe-verlag.com/book2/" rel="noopener">book2 Deutsch&ndash;Chinesisch</a>,
+            &copy; Goethe Verlag GmbH / 50LANGUAGES LLC, lizenziert unter
+            <a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" rel="license noopener">CC BY-NC-ND 3.0</a>
+            &ndash; nichtkommerzielle Nutzung. Die Aussprachebeispiele sind keine Aufnahmen des
+            Verlags, sondern wurden per Sprachsynthese erzeugt.
+        </p>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Florian Rüffer. All rights reserved.</p>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+    <script src="../assets/data/book2-lessons.js"></script>
+    <script src="../assets/data/zh-voices.js" onerror="void 0"></script>
+    <script src="../assets/data/zh-entries.js" onerror="void 0"></script>
+    <script src="../assets/js/zh-learn.js"></script>
+    <script src="../assets/js/chinese.js"></script>
+</body>
+</html>

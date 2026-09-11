@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading List - Learning</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('theme') || 'system';
+            if (saved === 'dark') { document.documentElement.setAttribute('data-theme','dark'); }
+            else if (saved === 'light') { document.documentElement.setAttribute('data-theme','light'); }
+            else { document.documentElement.setAttribute('data-theme',
+                   window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+        })();
+    </script>
+    <style>
+        .field { margin-bottom: 34px; }
+        .field > h2 {
+            font-size: 0.8rem; font-weight: 700; letter-spacing: 0.07em;
+            text-transform: uppercase; color: var(--text-secondary);
+            padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;
+        }
+        details.book {
+            border-bottom: 1px solid var(--border);
+        }
+        details.book > summary {
+            display: flex; align-items: baseline; gap: 11px;
+            padding: 13px 4px; cursor: pointer; list-style: none;
+            transition: var(--transition);
+        }
+        details.book > summary::-webkit-details-marker { display: none; }
+        details.book > summary:hover { background-color: var(--bg-secondary); }
+        .mark {
+            flex-shrink: 0; width: 17px; height: 17px; border-radius: 4px;
+            border: 1.5px solid var(--border); display: inline-flex;
+            align-items: center; justify-content: center;
+            font-size: 0.65rem; line-height: 1; align-self: center;
+        }
+        details.book.done .mark { border-color: #22c55e; color: #22c55e; background-color: rgba(34,197,94,0.12); }
+        .t { font-weight: 600; color: var(--text-primary); font-size: 0.98rem; line-height: 1.35; }
+        details.book.done .t { color: var(--text-secondary); }
+        .by { font-size: 0.85rem; color: var(--text-secondary); margin-left: auto; white-space: nowrap; }
+        .chev { color: var(--text-secondary); font-size: 0.7rem; transition: transform 0.2s ease; }
+        details.book[open] .chev { transform: rotate(90deg); }
+        details.book ul {
+            margin: 0 0 16px 45px; padding: 0; list-style: none;
+            font-size: 0.89rem; color: var(--text-secondary); line-height: 1.7;
+        }
+        details.book li { position: relative; padding-left: 15px; }
+        details.book li::before {
+            content: '·'; position: absolute; left: 2px; color: var(--accent); font-weight: 700;
+        }
+        @media (max-width: 560px) {
+            details.book > summary { flex-wrap: wrap; }
+            .by { margin-left: 28px; width: 100%; white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">Florian Rüffer</div>
+        <div class="nav-container">
+            <nav class="nav-links">
+                <a href="../index.html">Home</a>
+                <a href="../learning.html" class="active">Learning</a>
+                <a href="../tools.html">Tools</a>
+            </nav>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle Dark Mode"></button>
+            <button class="menu-toggle" aria-label="Menu">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <h1>Reading List</h1>
+        <p>Books by field &ndash; ticked ones are read. Click a title for a short summary.</p>
+
+        <section class="field">
+            <h2>Signal Integrity &amp; PCB Design</h2>
+
+            <details class="book">
+                <summary>
+                    <span class="mark"></span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">High-Speed Signal Propagation: Advanced Black Magic</span>
+                    <span class="by">Johnson &amp; Graham</span>
+                </summary>
+                <ul>
+                    <li>Sequel to <em>High-Speed Digital Design</em></li>
+                    <li>Transmission line behaviour at high frequencies</li>
+                    <li>Skin effect and dielectric losses</li>
+                    <li>Differential signalling</li>
+                </ul>
+            </details>
+
+            <details class="book done">
+                <summary>
+                    <span class="mark">✓</span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">Right the First Time &ndash; Volume 1</span>
+                    <span class="by">Lee W. Ritchey</span>
+                </summary>
+                <ul>
+                    <li>Stackup design and impedance control</li>
+                    <li>Routing rules for fast signals</li>
+                    <li>Practice-oriented, from industry experience</li>
+                </ul>
+            </details>
+
+            <details class="book">
+                <summary>
+                    <span class="mark"></span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">Right the First Time &ndash; Volume 2</span>
+                    <span class="by">Lee W. Ritchey</span>
+                </summary>
+                <ul>
+                    <li>Power delivery and decoupling</li>
+                    <li>EMI and system-level concerns</li>
+                    <li>Continues where volume 1 ends</li>
+                </ul>
+            </details>
+        </section>
+
+        <section class="field">
+            <h2>Electronics</h2>
+
+            <details class="book done">
+                <summary>
+                    <span class="mark">✓</span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">Practical Electronics for Inventors</span>
+                    <span class="by">Scherz &amp; Monk</span>
+                </summary>
+                <ul>
+                    <li>Broad reference across analog and digital</li>
+                    <li>Components, basic circuits, rules of thumb</li>
+                    <li>Kept around for looking things up</li>
+                </ul>
+            </details>
+        </section>
+
+        <section class="field">
+            <h2>FPGA &amp; Digital Design</h2>
+
+            <details class="book">
+                <summary>
+                    <span class="mark"></span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">FPGA Prototyping by SystemVerilog Examples</span>
+                    <span class="by">Pong P. Chu</span>
+                </summary>
+                <ul>
+                    <li>SystemVerilog from the ground up</li>
+                    <li>Builds towards a soft-core SoC (MicroBlaze MCS)</li>
+                    <li>Worked examples on real hardware</li>
+                </ul>
+            </details>
+        </section>
+
+        <section class="field">
+            <h2>Machine Learning</h2>
+
+            <details class="book done">
+                <summary>
+                    <span class="mark">✓</span>
+                    <span class="chev">&#9656;</span>
+                    <span class="t">Machine Learning Design Patterns</span>
+                    <span class="by">Lakshmanan, Robinson &amp; Munn</span>
+                </summary>
+                <ul>
+                    <li>Recurring problems in ML systems and their solutions</li>
+                    <li>Data representation, training, serving</li>
+                    <li>Reproducibility and responsible AI</li>
+                </ul>
+            </details>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Florian Rüffer. All rights reserved.</p>
+    </footer>
+
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>
